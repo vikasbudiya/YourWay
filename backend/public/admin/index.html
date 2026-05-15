@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YourWay Admin</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section id="loginPanel" class="login-panel">
+        <div class="brand-mark">Y</div>
+        <p class="eyebrow">YOURWAY ADMIN</p>
+        <h1>Realtime control center</h1>
+        <p class="muted">Manage users, support chat, SMS sync, sandbox balances, investments, transactions, and withdrawal reviews.</p>
+        <form id="loginForm" class="stack">
+          <input id="email" type="email" placeholder="Admin email" autocomplete="username" required />
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password" required />
+          <button type="submit">Login</button>
+        </form>
+        <p id="loginMessage" class="message"></p>
+      </section>
+
+      <section id="dashboard" class="dashboard hidden">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">YOURWAY</p>
+            <h1>Admin Dashboard</h1>
+          </div>
+          <button id="logoutButton" class="ghost">Logout</button>
+        </header>
+
+        <section id="stats" class="stats-grid"></section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">SUPPORT</p>
+              <h2>Help chat</h2>
+            </div>
+            <input id="supportSearch" type="search" placeholder="Search support" />
+          </div>
+          <div id="supportMessages" class="support-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">SEARCH</p>
+              <h2>User management</h2>
+            </div>
+            <input id="userSearch" type="search" placeholder="Search users" />
+          </div>
+          <div id="users" class="table"></div>
+        </section>
+
+        <section class="grid-two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">LIVE</p>
+                <h2>SMS logs</h2>
+              </div>
+              <input id="smsSearch" type="search" placeholder="Search SMS" />
+            </div>
+            <div id="smsLogs" class="table compact"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">FLOW</p>
+                <h2>Activity feed</h2>
+              </div>
+            </div>
+            <div id="activity" class="activity"></div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">PAYMENTS</p>
+              <h2>Transactions</h2>
+            </div>
+          </div>
+          <div id="transactions" class="table compact"></div>
+        </section>
+
+        <section class="grid-two">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">PLANS</p>
+                <h2>Investments</h2>
+              </div>
+            </div>
+            <div id="investments" class="table compact"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">REVIEW</p>
+                <h2>Withdrawals</h2>
+              </div>
+            </div>
+            <div id="withdrawals" class="table compact"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>

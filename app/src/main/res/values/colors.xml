@@ -2,4 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="yourway_black">#050706</color>
+    <color name="yourway_surface">#111612</color>
+    <color name="yourway_surface_alt">#192019</color>
+    <color name="yourway_neon">#39FF88</color>
+    <color name="yourway_neon_soft">#8039FF88</color>
+    <color name="yourway_text">#F2FFF7</color>
+    <color name="yourway_muted">#A9B9AD</color>
+    <color name="yourway_warning">#FFD166</color>
+    <color name="yourway_error">#FF5C7A</color>
 </resources>

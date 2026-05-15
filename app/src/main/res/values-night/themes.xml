@@ -1,7 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.YourWay" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowBackground">@color/yourway_black</item>
+        <item name="android:navigationBarColor">@color/yourway_black</item>
+        <item name="android:statusBarColor">@color/yourway_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="colorPrimary">@color/yourway_neon</item>
+        <item name="colorSecondary">@color/yourway_neon</item>
+        <item name="colorSurface">@color/yourway_surface</item>
     </style>
 </resources>

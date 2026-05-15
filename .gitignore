@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+backend/node_modules/
+backend/.env
+backend/logs/
+oracleJdk-26/
