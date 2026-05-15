@@ -18,8 +18,8 @@ object SmsSyncClient {
         val connection = (url.openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
             doOutput = true
-            connectTimeout = 5000
-            readTimeout = 5000
+            connectTimeout = 60000
+            readTimeout = 60000
             setRequestProperty("Content-Type", "application/json")
         }
 

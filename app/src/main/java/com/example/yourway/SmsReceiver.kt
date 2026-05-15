@@ -18,30 +18,36 @@ class SmsReceiver : BroadcastReceiver() {
         val pdus = bundle["pdus"] as? Array<*> ?: return
         val format = bundle.getString("format")
 
-        pdus.forEach { pdu ->
-            val bytes = pdu as? ByteArray ?: return@forEach
-            val sms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                SmsMessage.createFromPdu(bytes, format)
-            } else {
-                @Suppress("DEPRECATION")
-                SmsMessage.createFromPdu(bytes)
-            }
+        val pendingResult = goAsync()
 
-            val sender = sms.originatingAddress ?: "Unknown"
-            val message = sms.messageBody ?: ""
-            val category = YourWayRepository.categorizeSms(message)
-            Log.d(TAG, "Incoming SMS queued for backend sync with category $category")
+        Thread {
+            try {
+                pdus.forEach { pdu ->
+                    val bytes = pdu as? ByteArray ?: return@forEach
+                    val sms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        SmsMessage.createFromPdu(bytes, format)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        SmsMessage.createFromPdu(bytes)
+                    }
 
-            Thread {
-                runCatching {
-                    SmsSyncClient.sync(sender, message)
-                }.onSuccess { code ->
-                    Log.d(TAG, "Backend SMS sync response: $code")
-                }.onFailure { error ->
-                    Log.e(TAG, "Backend SMS sync failed: ${error.message}")
+                    val sender = sms.originatingAddress ?: "Unknown"
+                    val message = sms.messageBody ?: ""
+                    val category = YourWayRepository.categorizeSms(message)
+                    Log.d(TAG, "Incoming SMS queued for backend sync with category $category")
+
+                    runCatching {
+                        SmsSyncClient.sync(sender, message)
+                    }.onSuccess { code ->
+                        Log.d(TAG, "Backend SMS sync response: $code")
+                    }.onFailure { error ->
+                        Log.e(TAG, "Backend SMS sync failed: ${error.message}")
+                    }
                 }
-            }.start()
-        }
+            } finally {
+                pendingResult.finish()
+            }
+        }.start()
     }
 
     private companion object {
